@@ -1,0 +1,10 @@
+resendtiems: 5
+grpc_port: :8888
+
+
+
+mysql_user: "root"
+mysql_passwd: "12345678"
+mysql_host: "127.0.0.1"
+mysql_port: 3306
+mysql_dbname: "practice"

@@ -1,0 +1,16 @@
+syntax="proto3";
+package messenger;
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+option go_package = "pb";
+
+message Message {
+    string MessageBody = 1;
+    string Group = 2;
+}
+message reponse{
+    bool ok=1;
+    string info =3;
+}
+service messenger{
+    rpc SendMessage(stream Message)returns (stream reponse);
+}
