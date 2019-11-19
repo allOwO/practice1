@@ -34,9 +34,8 @@ func (m *MessageInfo) SendMessage(stream pb.Messenger_SendMessageServer) error {
 		//在之后添加功能
 		log.Println(in.GetGroup(), in.GetMessageBody())
 		userlist:=[]Globavar.User{}
-		err=model.GetAllKeys(in.GetGroup(),&userlist)//从数据库取出来所有的
-		if err!=nil{
-			log.Fatalln(err)
+		if ok:=model.FindAllUsers(in.GetGroup(),&userlist);ok==false{
+			log.Fatalln("GET Users Fail")
 		}
 		messtmp:=&Globavar.Message{
 			Mess:        in.GetMessageBody(),
@@ -70,7 +69,7 @@ func sendToRabbitmq(Users []Globavar.User,mbody *Globavar.Message,typ string){
 	if err != nil {
 		log.Fatalln(err)
 	}
-	model.SetKeys("messages",mbody)
+	model.CreateMessage(mbody)
 	for _,item:=range Users {
 		mess, _ := jsoniter.Marshal(Globavar.MessJsonBody{
 			User:    item,
@@ -110,16 +109,23 @@ func RecvRabbitmq(ctx context.Context,queue amqp.Queue,ch *amqp.Channel){
 				err:=ResendMail(usermess.User.Mail,"hello",usermess.Message.Mess)
 				if err!=nil{
 					ch.Ack(elem.DeliveryTag,false)
-					model.InsertMessSucess("message")
+					usermess.Message.UpdatedAt=time.Now()
+					model.InsertMessSucess(&usermess.Message)
 				}else{
 					ch.Ack(elem.DeliveryTag,true)
+					usermess.Message.UpdatedAt=time.Now()
+					model.InsertMessFail(&usermess.Message)
 				}
 			}else if usermess.Typ=="Phone"{
 				SendShortMess()
 				ch.Ack(elem.DeliveryTag,true)
+				usermess.Message.UpdatedAt=time.Now()
+				model.InsertMessSucess(&usermess.Message)
 			}else if usermess.Typ=="wechat"{
 				SendOfficialAccount()
 				ch.Ack(elem.DeliveryTag,true)
+				usermess.Message.UpdatedAt=time.Now()
+				model.InsertMessSucess(&usermess.Message)
 			}
 		}
 	}

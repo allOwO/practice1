@@ -8,12 +8,12 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/jinzhu/gorm v1.9.11
 	github.com/json-iterator/go v1.1.8
+	github.com/labstack/echo/v4 v4.1.11
 	github.com/mailgun/mailgun-go/v3 v3.6.1
 	github.com/mwitkow/go-proto-validators v0.2.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.5.0
 	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
-	github.com/stretchr/testify v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
 	golang.org/x/sys v0.0.0-20191112214154-59a1497f0cea // indirect
 	golang.org/x/text v0.3.2 // indirect

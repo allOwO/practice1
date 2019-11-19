@@ -1,78 +1,121 @@
 package model
 
 import (
-	"PracticeItem/Globavar"
-	"errors"
-	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/spf13/viper"
 	"log"
+	"PracticeItem/Globavar"
 )
 
 var db *gorm.DB
 
-func GetAllKeys(tablename string,slice interface{})error{
-	if checkkey(tablename)==true{
-		Globavar.MysqlSync.RLock()
-		db.Table(tablename).Find(slice)
-		Globavar.MysqlSync.RUnlock()
-		return nil
-	}
-	return errors.New("Table Name Error")
-}
-func InsertKey(tablename string,key interface{})error{
-	if checkkey(tablename)==true{
-		Globavar.MysqlSync.Lock()
-		db.Table(tablename).Save(key)
-		Globavar.MysqlSync.Unlock()
-		return nil
-	}
-	return errors.New("Table Name Error")
-}
-func SetKeys(tablename string,key interface{})error{
-	if checkkey(tablename)==true{
-		Globavar.MysqlSync.Lock()
-		db.Table(tablename).Create(key)
-		Globavar.MysqlSync.Unlock()
-		return nil
-	}
-	return errors.New("Table Name Error")
-}
-//success bug?
-func InsertMessSucess(tablename string,message *Globavar.Message)error{
-	if checkkey(tablename)==true{
-		Globavar.MysqlSync.Lock()
-		db.Table(tablename).Where("id = ?", message.ID).UpdateColumn("success_user",gorm.Expr("success_user + ?", 1))
-		Globavar.MysqlSync.Unlock()
-		return nil
-	}
-	return errors.New("Table Name Error")
-}
-func InsertMessFail(tablename string,message *Globavar.Message)error{
-	if checkkey(tablename)==true{
-		Globavar.MysqlSync.Lock()
-		db.Table(tablename).Where("id = ?", message.ID).Update("fail_user",gorm.Expr("fail_user + ?", 1))
-		Globavar.MysqlSync.Unlock()
-		return nil
-	}
-	return errors.New("Table Name Error")
-}
-func checkkey(tablename string)bool{
-	if tablename!="system_users" && tablename!="workers"&& tablename!="service_staffs"{
+func FindAllUsers(tablename string,slice *[]Globavar.User) bool {
+	if b := db.Table("all_users").Where(tablename+"= 1").Find(slice).GetErrors(); len(b)!=0 {
 		return false
 	}
 	return true
 }
+
+//Update User
+//save 更新所有字段
+func UpdateUser(tablenames []string, key *Globavar.User) bool {
+	key = setGroups(tablenames, key)
+	if b := db.Table("all_users").Where("user_mail = ?",key.Mail).Updates(key).GetErrors(); len(b)!=0 {
+		return false
+	}
+	return true
+}
+//Create user
+
+func CreateUser(tablenames []string, key *Globavar.User) bool {
+	key = setGroups(tablenames, key)
+	if b := db.Table("all_users").Create(key).GetErrors(); len(b)!=0 {
+		return false
+	}
+	return true
+}
+func CreateMessage(key *Globavar.Message) bool {
+	if b := db.Table("messages").Create(key).GetErrors(); len(b)!=0 {
+		return false
+	}
+	return true
+}
+func setGroups(tablenames []string, key *Globavar.User) *Globavar.User {
+	su:=false
+	w:=false
+	ss:=false
+	for _, name := range tablenames {
+		if name == "system_user" {
+			su= true
+		} else if name == "worker" {
+			w= true
+		} else if name == "service_staff" {
+			ss = true
+		}
+	}
+	key.SystemUser=su
+	key.Workers=w
+	key.ServiceStaff=ss
+	return key
+}
+func ChangeGroups(tablenames []string, key interface{}) bool {
+	for _, name := range tablenames {
+		if b := db.Table(name).Create(key).GetErrors(); b != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func GetUserInfo(usermail string) *Globavar.WebUserMess {
+	senduser := Globavar.NewWebUserMess()
+	tmp := &Globavar.User{}
+	selectflag := true
+	if ok := db.Table("all_users").Where("user_mail = ?", usermail).First(tmp).RecordNotFound(); ok == false && selectflag {
+		senduser.Groups = append(senduser.Groups, "system_users")
+		selectflag = false
+	}
+	if tmp.Workers == true {
+		senduser.Groups = append(senduser.Groups, "workers")
+	}
+	if tmp.SystemUser == true {
+		senduser.Groups = append(senduser.Groups, "system_user")
+	}
+	if tmp.ServiceStaff == true {
+		senduser.Groups = append(senduser.Groups, "service_staff")
+	}
+	senduser.UserName = tmp.Name
+	senduser.UserMail = tmp.Mail
+	senduser.UserPhone = tmp.Phone
+	log.Println("find user sql",tmp,senduser)
+	return senduser
+}
+
+//success bug?
+func InsertMessSucess(message *Globavar.Message) bool {
+	if err := db.Table("all_users").Where("id = ?", message.ID).UpdateColumn("success_user", gorm.Expr("success_user + ?", 1)).GetErrors(); err != nil {
+		return false
+	}
+	return true
+
+}
+func InsertMessFail(message *Globavar.Message) bool {
+	if err := db.Table("all_users").Where("id = ?", message.ID).UpdateColumn("fail_user", gorm.Expr("fail_user + ?", 1)).GetErrors(); err != nil {
+		return false
+	}
+	return true
+
+}
+
+//func checkkey(tablename string) bool {
+//	if tablename != "system_users" && tablename != "workers" && tablename != "service_staffs" {
+//		return false
+//	}
+//	return true
+//}
 func init() {
-	//config
-	user:=viper.GetString("mysql_user")
-	passwd:=viper.GetString("mysql_passwd")
-	host:=viper.GetInt("mysql_host")
-	port:=viper.GetString("mysql_port")
-	dbname:=viper.GetString("mysql_dbname")
 	//inti mysql
-	mysqlArgs := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", user, passwd, host, port, dbname)
+	mysqlArgs := "root:12345678@(localhost:3306)/practice?charset=utf8&parseTime=True&loc=Local"
 	DB, err := gorm.Open("mysql", mysqlArgs)
 	if err != nil {
 		log.Fatalf("Open mysql error:%v", err)
@@ -81,40 +124,10 @@ func init() {
 	CheckTables()
 }
 
-
-//type User struct {
-//	ID        int    `gorm:"AUTO_INCREMENT"`
-//	Name      string `gorm:"user_name"`
-//	CreatedAt string `gorm:"created_at"`
-//	UpdatedAt string `gorm:"updated_at"`
-//}
-//type Group struct {
-//	ID        int    `gorm:"AUTO_INCREMENT"`
-//	GroupName string `gorm:"group_name"`
-//	CreatedAt string `gorm:"created_at"`
-//	UpdatedAt string `gorm:"updated_at"`
-//}
-//type message struct {
-//	ID        int    `gorm:"AUTO_INCREMENT"`
-//	Mess      string `gorm:"mess"`
-//	GroupID   int    `gormL:"group_id"`
-//	CreatedAt string `gorm:"created_at"`
-//	UpdatedAt string `gorm:"updated_at"`
-//}
-
 func CheckTables() {
 	//有主键索引，用不到其他索引了
-	if db.HasTable("system_users") == false {
-		db.Table("system_users").CreateTable(&Globavar.User{})
-	}
-	if db.HasTable("workers") == false {
-		db.Table("workers").CreateTable(&Globavar.User{})
-	}
-	if db.HasTable("service_staffs") == false {
-		db.Table("service_staffs").CreateTable(&Globavar.User{})
-	}
-	if db.HasTable("groups") == false {
-		db.Table("groups").CreateTable(&Globavar.User{})
+	if db.HasTable("all_users") == false {
+		db.Table("all_users").CreateTable(&Globavar.User{})
 	}
 	if db.HasTable("messages") == false {
 		db.Table("messages").CreateTable(&Globavar.User{})

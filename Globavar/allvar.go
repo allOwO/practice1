@@ -17,34 +17,50 @@ var Typ string
 var Conn *amqp.Connection
 
 var MysqlSync sync.RWMutex
+
+//sql User
 type User struct {
-	ID        int       `gorm:"primary_key,AUTO_INCREMENT"`
-	Name      string    `gorm:"user_name"`
-	Phone     string    `gorm:"user_phone"`
-	Mail      string    `gorm:"user_mail"`
-	CreatedAt time.Time `gorm:"created_at"`
-	UpdatedAt time.Time `gorm:"updated_at"`
+	ID           int    `gorm:"primary_key;AUTO_INCREMENT"`
+	Name         string `gorm:"Column:user_name;not null"`
+	Phone        string `gorm:"Column:user_phone;not null"`
+	Mail         string `gorm:"Column:user_mail;unique;not null;index"`
+	SystemUser   bool   `gorm:"Column:system_user"`
+	Workers      bool   `gorm:"Column:worker"`
+	ServiceStaff bool   `gorm:"Column:service_staff"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    *time.Time
 }
 
-//type Group struct {
-//	ID        int    `gorm:"AUTO_INCREMENT"`
-//	GroupName string `gorm:"group_name"`
-//	CreatedAt time.Time `gorm:"created_at"`
-//	UpdatedAt time.Time `gorm:"updated_at"`
-//}
+//用来传输web
+type WebUserMess struct {
+	UserName  string   `json:"user_name"`
+	UserPhone string   `json:"user_phone"`
+	UserMail  string   `json:"user_mail" `
+	Groups    []string `json:"groups"`
+}
+
+func NewWebUserMess() *WebUserMess {
+	wu := new(WebUserMess)
+	wu.Groups = make([]string, 0, 3)
+	return wu
+}
+
+//sql message
 type Message struct {
-	ID          int       `gorm:"AUTO_INCREMENT"`
-	Mess        string    `gorm:"mess"`
-	Group       string    `gorm:"group"`
-	Success     bool      `gorm:"success"`
-	SuccessUser int       `gorm:"success_user"`
-	FailUser    int       `gorm:"fail_user"`
-	CreatedAt   time.Time `gorm:"created_at"`
-	UpdatedAt   time.Time `gorm:"updated_at"`
+	ID          int       `gorm:"AUTO_INCREMENT;primary_key"`
+	Mess        string    `gorm:"Column:mess;unique;not null;"`
+	Group       string    `gorm:"Column:group"`
+	Success     bool      `gorm:"Column:success"`
+	SuccessUser int       `gorm:"Column:success_user"`
+	FailUser    int       `gorm:"Column:fail_user"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    time.Time
 }
 
 type MessJsonBody struct {
-	User User
+	User    User
 	Typ     string
 	Message Message
 }
