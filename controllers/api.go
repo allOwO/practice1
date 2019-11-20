@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"PracticeItem/Globavar"
+	"PracticeItem/Globalvar"
 	"PracticeItem/model"
 	"PracticeItem/pb"
 	"context"
@@ -33,11 +33,11 @@ func (m *MessageInfo) SendMessage(stream pb.Messenger_SendMessageServer) error {
 		}
 		//在之后添加功能
 		log.Println(in.GetGroup(), in.GetMessageBody())
-		userlist:=[]Globavar.User{}
+		userlist:=[]Globalvar.User{}
 		if ok:=model.FindAllUsers(in.GetGroup(),&userlist);ok==false{
 			log.Fatalln("GET Users Fail")
 		}
-		messtmp:=&Globavar.Message{
+		messtmp:=&Globalvar.Message{
 			Mess:        in.GetMessageBody(),
 			Group:       in.GetGroup(),
 			Success:     false,
@@ -46,14 +46,14 @@ func (m *MessageInfo) SendMessage(stream pb.Messenger_SendMessageServer) error {
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
-		sendToRabbitmq(userlist,messtmp,Globavar.Typ)
+		sendToRabbitmq(userlist,messtmp,Globalvar.Typ)
 
 	}
 }
 
 
 //生产者
-func sendToRabbitmq(Users []Globavar.User,mbody *Globavar.Message,typ string){
+func sendToRabbitmq(Users []Globalvar.User,mbody *Globalvar.Message,typ string){
 	//新建一个队列
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
@@ -71,7 +71,7 @@ func sendToRabbitmq(Users []Globavar.User,mbody *Globavar.Message,typ string){
 	}
 	model.CreateMessage(mbody)
 	for _,item:=range Users {
-		mess, _ := jsoniter.Marshal(Globavar.MessJsonBody{
+		mess, _ := jsoniter.Marshal(Globalvar.MessJsonBody{
 			User:    item,
 			Message: *mbody,
 			Typ:     typ,
@@ -103,7 +103,7 @@ func RecvRabbitmq(ctx context.Context,queue amqp.Queue,ch *amqp.Channel){
 		case <-ctx.Done():
 			return
 		case elem:=<-msg:
-			usermess:=Globavar.MessJsonBody{}
+			usermess:=Globalvar.MessJsonBody{}
 			jsoniter.Unmarshal(elem.Body,&usermess)
 			if usermess.Typ=="mail"{
 				err:=ResendMail(usermess.User.Mail,"hello",usermess.Message.Mess)

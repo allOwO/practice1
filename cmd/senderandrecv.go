@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"PracticeItem/Globavar"
+	"PracticeItem/Globalvar"
 	"PracticeItem/controllers"
 	"PracticeItem/pb"
 	"context"
@@ -75,7 +75,7 @@ func init() {
 			}
 			//给线程设置一个关闭，好像没啥用
 			ctx, cencal := context.WithCancel(context.Background())
-			for i := 0; i < Globavar.Recvnum; i++ {
+			for i := 0; i < Globalvar.Recvnum; i++ {
 				go controllers.RecvRabbitmq(ctx,queue,ch)
 			}
 			//退出
@@ -93,8 +93,8 @@ func init() {
 	rootCmd.AddCommand(jobs)
 	jobs.AddCommand(send)
 	jobs.AddCommand(recv)
-	jobs.PersistentFlags().IntVarP(&Globavar.Recvnum, "number", "n", 10, "")
-	send.PersistentFlags().StringVarP(&Globavar.Typ, "type", "t", "mail", "")
+	jobs.PersistentFlags().IntVarP(&Globalvar.Recvnum, "number", "n", 10, "")
+	send.PersistentFlags().StringVarP(&Globalvar.Typ, "type", "t", "mail", "")
 
 }
 

@@ -20,7 +20,6 @@ func init() {
 			e.Use(middleware.Recover())
 			e.Static("/","./dist/index.html")
 			e.Static("/static", "./dist/static")
-			//e.GET("/",Index)
 			e.POST("/senduser", web.CreateUser)
 			e.POST("/changeuser", web.ChangeUser)
 			e.GET("/checkuser",web.CheckUser)

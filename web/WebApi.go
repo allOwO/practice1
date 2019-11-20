@@ -1,7 +1,7 @@
 package web
 
 import (
-	"PracticeItem/Globavar"
+	"PracticeItem/Globalvar"
 	"PracticeItem/model"
 	"encoding/json"
 	"github.com/labstack/echo/v4"
@@ -16,7 +16,7 @@ func CreateUser(ctx echo.Context) error {
 	//body, _ := ioutil.ReadAll(ctx.Request().Body)
 	//log.Printf("body:%s\n", string(body))
 
-	tmp:= new(Globavar.WebUserMess)
+	tmp:= new(Globalvar.WebUserMess)
 	err := ctx.Bind(tmp)
 	log.Println("new user",tmp)
 	if err != nil {
@@ -62,7 +62,7 @@ func CreateUser(ctx echo.Context) error {
 		})
 	}
 	//debug
-	user := &Globavar.User{
+	user := &Globalvar.User{
 		Name:      tmp.UserName,
 		Phone:     tmp.UserPhone,
 		Mail:      tmp.UserMail,
@@ -89,7 +89,7 @@ func ChangeUser(ctx echo.Context) error {
 	log.Printf("body:%s\n", string(body))
 	//tmp := new(WebUserMess)
 	//err := ctx.Bind(tmp)
-	tmp:= new(Globavar.WebUserMess)
+	tmp:= new(Globalvar.WebUserMess)
 
 	err:=json.Unmarshal(body,&tmp)
 	log.Println(tmp)
@@ -136,7 +136,7 @@ func ChangeUser(ctx echo.Context) error {
 		})
 	}
 	//debug
-	user := &Globavar.User{
+	user := &Globalvar.User{
 		Name:      tmp.UserName,
 		Phone:     tmp.UserPhone,
 		Mail:      tmp.UserMail,
@@ -186,7 +186,7 @@ const (
 type SendJson struct {
 	Code    int    `json:"code"`
 	Message string `json:"msg"`
-	Data    *Globavar.WebUserMess `json:"data"`
+	Data    *Globalvar.WebUserMess `json:"data"`
 }
 
 //email verify

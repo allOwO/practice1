@@ -4,12 +4,12 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
-	"PracticeItem/Globavar"
+	"PracticeItem/Globalvar"
 )
 
 var db *gorm.DB
 
-func FindAllUsers(tablename string,slice *[]Globavar.User) bool {
+func FindAllUsers(tablename string,slice *[]Globalvar.User) bool {
 	if b := db.Table("all_users").Where(tablename+"= 1").Find(slice).GetErrors(); len(b)!=0 {
 		return false
 	}
@@ -18,29 +18,32 @@ func FindAllUsers(tablename string,slice *[]Globavar.User) bool {
 
 //Update User
 //save 更新所有字段
-func UpdateUser(tablenames []string, key *Globavar.User) bool {
+func UpdateUser(tablenames []string, key *Globalvar.User) bool {
 	key = setGroups(tablenames, key)
-	if b := db.Table("all_users").Where("user_mail = ?",key.Mail).Updates(key).GetErrors(); len(b)!=0 {
+	if b:=db.Table("all_users").Where("user_mail = ?",key.Mail).Find(key).GetErrors();len(b)!=0{
+		return false
+	}
+	if b := db.Debug().Table("all_users").Where("id = ?",key.Mail).Updates(key).GetErrors(); len(b)!=0 {
 		return false
 	}
 	return true
 }
 //Create user
 
-func CreateUser(tablenames []string, key *Globavar.User) bool {
+func CreateUser(tablenames []string, key *Globalvar.User) bool {
 	key = setGroups(tablenames, key)
 	if b := db.Table("all_users").Create(key).GetErrors(); len(b)!=0 {
 		return false
 	}
 	return true
 }
-func CreateMessage(key *Globavar.Message) bool {
+func CreateMessage(key *Globalvar.Message) bool {
 	if b := db.Table("messages").Create(key).GetErrors(); len(b)!=0 {
 		return false
 	}
 	return true
 }
-func setGroups(tablenames []string, key *Globavar.User) *Globavar.User {
+func setGroups(tablenames []string, key *Globalvar.User) *Globalvar.User {
 	su:=false
 	w:=false
 	ss:=false
@@ -67,9 +70,9 @@ func ChangeGroups(tablenames []string, key interface{}) bool {
 	return true
 }
 
-func GetUserInfo(usermail string) *Globavar.WebUserMess {
-	senduser := Globavar.NewWebUserMess()
-	tmp := &Globavar.User{}
+func GetUserInfo(usermail string) *Globalvar.WebUserMess {
+	senduser := Globalvar.NewWebUserMess()
+	tmp := &Globalvar.User{}
 	selectflag := true
 	if ok := db.Table("all_users").Where("user_mail = ?", usermail).First(tmp).RecordNotFound(); ok == false && selectflag {
 		senduser.Groups = append(senduser.Groups, "system_users")
@@ -92,14 +95,14 @@ func GetUserInfo(usermail string) *Globavar.WebUserMess {
 }
 
 //success bug?
-func InsertMessSucess(message *Globavar.Message) bool {
+func InsertMessSucess(message *Globalvar.Message) bool {
 	if err := db.Table("all_users").Where("id = ?", message.ID).UpdateColumn("success_user", gorm.Expr("success_user + ?", 1)).GetErrors(); err != nil {
 		return false
 	}
 	return true
 
 }
-func InsertMessFail(message *Globavar.Message) bool {
+func InsertMessFail(message *Globalvar.Message) bool {
 	if err := db.Table("all_users").Where("id = ?", message.ID).UpdateColumn("fail_user", gorm.Expr("fail_user + ?", 1)).GetErrors(); err != nil {
 		return false
 	}
@@ -127,9 +130,9 @@ func init() {
 func CheckTables() {
 	//有主键索引，用不到其他索引了
 	if db.HasTable("all_users") == false {
-		db.Table("all_users").CreateTable(&Globavar.User{})
+		db.Table("all_users").CreateTable(&Globalvar.User{})
 	}
 	if db.HasTable("messages") == false {
-		db.Table("messages").CreateTable(&Globavar.User{})
+		db.Table("messages").CreateTable(&Globalvar.User{})
 	}
 }

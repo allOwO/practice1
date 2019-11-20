@@ -1,4 +1,4 @@
-package Globavar
+package Globalvar
 
 import (
 	"github.com/streadway/amqp"
