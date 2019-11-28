@@ -1,8 +1,7 @@
-package web
+package controllers
 
 import (
-	"PracticeItem/Globalvar"
-	"PracticeItem/model"
+	"PracticeItem"
 	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"io/ioutil"
@@ -11,14 +10,19 @@ import (
 	"strings"
 	"time"
 )
-
-func CreateUser(ctx echo.Context) error {
+type WebController struct {
+	webuser PracticeItem.WebUserService
+	user PracticeItem.UserService
+}
+func NewWebController(webuser PracticeItem.WebUserService,user PracticeItem.UserService)*WebController{
+	return &WebController{webuser:webuser,user:user}
+}
+func (w *WebController)CreateUser(ctx echo.Context) error {
 	//body, _ := ioutil.ReadAll(ctx.Request().Body)
 	//log.Printf("body:%s\n", string(body))
-
-	tmp:= new(Globalvar.WebUserMess)
+	tmp := PracticeItem.NewWebUserMess()
 	err := ctx.Bind(tmp)
-	log.Println("new user",tmp)
+	log.Println("new user", tmp)
 	if err != nil {
 		return ctx.JSON(200, SendJson{
 			Code:    stFail,
@@ -62,15 +66,15 @@ func CreateUser(ctx echo.Context) error {
 		})
 	}
 	//debug
-	user := &Globalvar.User{
+	user := &PracticeItem.User{
 		Name:      tmp.UserName,
 		Phone:     tmp.UserPhone,
 		Mail:      tmp.UserMail,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-	tmp.UserMail=strings.ToLower(tmp.UserMail)
-	if ok := model.CreateUser(tmp.Groups, user); ok==false {
+	tmp.UserMail = strings.ToLower(tmp.UserMail)
+	if ok := w.user.CreateUser(tmp.Groups, user); ok == false {
 		return ctx.JSON(200, SendJson{
 			Code:    stFail,
 			Message: "数据库错误或已存在",
@@ -83,15 +87,16 @@ func CreateUser(ctx echo.Context) error {
 		Data:    nil,
 	})
 }
+
 //post /changeuser
-func ChangeUser(ctx echo.Context) error {
+func (w *WebController)ChangeUser(ctx echo.Context) error {
 	body, _ := ioutil.ReadAll(ctx.Request().Body)
 	log.Printf("body:%s\n", string(body))
 	//tmp := new(WebUserMess)
 	//err := ctx.Bind(tmp)
-	tmp:= new(Globalvar.WebUserMess)
+	tmp := new(PracticeItem.WebUserMess)
 
-	err:=json.Unmarshal(body,&tmp)
+	err := json.Unmarshal(body, &tmp)
 	log.Println(tmp)
 	if err != nil {
 		return ctx.JSON(200, SendJson{
@@ -136,15 +141,15 @@ func ChangeUser(ctx echo.Context) error {
 		})
 	}
 	//debug
-	user := &Globalvar.User{
+	user := &PracticeItem.User{
 		Name:      tmp.UserName,
 		Phone:     tmp.UserPhone,
 		Mail:      tmp.UserMail,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-	tmp.UserMail=strings.ToLower(tmp.UserMail)
-	if ok := model.UpdateUser(tmp.Groups, user); ok==false {
+	tmp.UserMail = strings.ToLower(tmp.UserMail)
+	if ok := w.user.UpdateUser(tmp.Groups, user); ok == false {
 		return ctx.JSON(200, SendJson{
 			Code:    stFail,
 			Message: "数据库错误或已存在",
@@ -157,13 +162,14 @@ func ChangeUser(ctx echo.Context) error {
 		Data:    nil,
 	})
 }
+
 //get user
-func CheckUser(ctx echo.Context) error {
-	tmp:=ctx.QueryParam("mail")
+func (w *WebController)CheckUser(ctx echo.Context) error {
+	tmp := ctx.QueryParam("mail")
 	log.Println(tmp)
-	usr := model.GetUserInfo(tmp)
+	usr := w.webuser.GetUserInfo(tmp)
 	log.Println(usr)
-	//log.Println(model.GetUsertest())
+	//log.Println(service.GetUsertest())
 	if usr == nil {
 		return ctx.JSON(200, SendJson{
 			Code:    stFail,
@@ -184,9 +190,9 @@ const (
 )
 
 type SendJson struct {
-	Code    int    `json:"code"`
-	Message string `json:"msg"`
-	Data    *Globalvar.WebUserMess `json:"data"`
+	Code    int                       `json:"code"`
+	Message string                    `json:"msg"`
+	Data    *PracticeItem.WebUserMess `json:"data"`
 }
 
 //email verify

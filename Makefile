@@ -1,13 +1,14 @@
 
 build:
 	@go mod vendor
-	@go build -mod vendor -v -o messenger.exe main/main.go
+	@go build -mod vendor -v -o messenger main/main.go
 proto:
 	# If build proto failed, make sure you have protoc installed and:
-	# go get -u github.com/google/protobuf
-	# go get -u github.com/golang/protobuf/protoc-gen-go
-	# go install github.com/mwitkow/go-proto-validators/protoc-gen-govalidators
+	go get -u github.com/google/protobuf
+	go get -u github.com/golang/protobuf/protoc-gen-go
+	go install github.com/mwitkow/go-proto-validators/protoc-gen-govalidators
 	# mkdir -p $GOPATH/src/github.com/googleapis && git clone git@github.com:googleapis/googleapis.git $GOPATH/src/github.com/googleapis/
+	go get -u github.com/googleapis/googleapis
 	@mkdir -p pb
 	protoc \
 	 -I . \

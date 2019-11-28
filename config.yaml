@@ -1,10 +1,13 @@
-resendtiems: 5
-grpc_port: :8888
-
-
-
-mysql_user: "root"
-mysql_passwd: "12345678"
-mysql_host: "127.0.0.1"
-mysql_port: 3306
-mysql_dbname: "practice"
+#times limit 0-20
+resendtiems: 1
+# grpc
+grpc_port: ":3000"
+grpc_host: "127.0.0.1"
+#rabbitmq
+mq_user: "guest"
+mq_passwd: "guest"
+mq_host: "localhost"
+mq_port: 5672
+rabbitmq_mail_queue: "mail"
+# mysql
+mysql_dsn: "root:@(localhost:3306)/practice?charset=utf8&parseTime=True&loc=Local"
