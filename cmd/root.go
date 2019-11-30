@@ -28,21 +28,23 @@ func init() {
 //初始化配置文件
 //
 func initConfig() {
-	if cfgFile==""{
+	viper.SetConfigType("yaml")
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile) //从string获取文件路径，viper不检查默认
+	} else {
 		//新建yaml文件
 		viper.AddConfigPath(".")
 		viper.SetConfigName("config.yaml")
 		log.Fatalln("No Config File.")
+
 	}
-	viper.SetConfigFile(cfgFile) //从string获取文件路径，viper不检查默认
 	//获取环境变量
 	viper.AutomaticEnv()
-	viper.SetConfigType("yaml")
 	//读取
 	if err := viper.ReadInConfig(); err == nil {
 		log.Println("Read Config File :", viper.ConfigFileUsed())
 	} else {
-		log.Fatalln("Read Config error",err)
+		log.Fatalln("Read Config error", err)
 	}
 }
 

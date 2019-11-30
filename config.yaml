@@ -1,5 +1,4 @@
-#times limit 0-20
-resendtiems: 1
+attempt_times: 1
 # grpc
 grpc_port: ":3000"
 grpc_host: "127.0.0.1"
@@ -7,7 +6,8 @@ grpc_host: "127.0.0.1"
 mq_user: "guest"
 mq_passwd: "guest"
 mq_host: "localhost"
+mq_vhost: ""
 mq_port: 5672
 rabbitmq_mail_queue: "mail"
 # mysql
-mysql_dsn: "root:@(localhost:3306)/practice?charset=utf8&parseTime=True&loc=Local"
+mysql_dsn: "root:12345678@tcp(127.0.0.1:3306)/practice?charset=utf8&parseTime=True&loc=Local"

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"PracticeItem"
 	"PracticeItem/controllers"
 	"PracticeItem/service"
 	"github.com/fpay/foundation-go/database"
@@ -18,6 +19,8 @@ func init() {
 		Use:   "dashboard",
 		Short: "Messenger web",
 		Run: func(cmd *cobra.Command, args []string) {
+			env:=new(PracticeItem.AppConfig)
+			env.Load()
 			db, err := database.NewDatabase(database.DatabaseOptions{Driver: "mysql",Dsn:env.Mysqldsn})
 			if err!=nil{
 				log.Fatalln("Mysql error:",err)

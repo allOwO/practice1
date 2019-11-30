@@ -1,7 +1,7 @@
 
 build:
 	@go mod vendor
-	@go build -mod vendor -v -o messenger main/main.go
+	@go build -v -o messenger.exe main/main.go
 proto:
 	# If build proto failed, make sure you have protoc installed and:
 	go get -u github.com/google/protobuf

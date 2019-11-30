@@ -19,7 +19,7 @@ import (
 )
 //发送类型
 var Typ string
-var Attempt int
+
 
 var send = &cobra.Command{
 	Use: "sender",
@@ -27,11 +27,12 @@ var send = &cobra.Command{
 		env:=new(PracticeItem.AppConfig)
 		env.Load()
 		db, err := database.NewDatabase(database.DatabaseOptions{Driver: "mysql",Dsn:env.Mysqldsn})
+		log.Println(env)
 		if err!=nil{
 			log.Fatalln("Mysql error:",err)
 		}
 		user:=service.NewDBservice(db)
-		newMess:=controllers.NewproducerController(user,user,env,Typ,Attempt)
+		newMess:=controllers.NewproducerController(user,user,env,Typ,Cosumernum)
 
 
 		listen, err := net.Listen("tcp", env.GrpcPort)
@@ -68,7 +69,7 @@ func init() {
 	rootCmd.AddCommand(jobs)
 	jobs.AddCommand(send)
 	jobs.AddCommand(notification)
-	jobs.PersistentFlags().IntVarP(&Attempt, "number", "n", 0, "")
-	send.PersistentFlags().StringVarP(&Typ, "type", "t", "mail", "")
+	jobs.PersistentFlags().IntVarP(&Cosumernum, "number", "n", 0, "")
+	send.PersistentFlags().StringVarP(&Typ, "type", "t", "mail", "mail & short(short message) & wechat")
 
 }

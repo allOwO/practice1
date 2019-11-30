@@ -10,12 +10,14 @@ type DBservice struct{
 }
 
 func NewDBservice(db *database.DB)*DBservice{
-	return &DBservice{Db:db}
+	d:=&DBservice{Db:db}
+	d.CheckTables()
+	return d
 }
 //查询分组内所有用户
 func (d *DBservice)GetAllUsers(tablename string) (result *[]PracticeItem.User,ok bool) {
 	result = &[]PracticeItem.User{}
-	if b := d.Db.Table("all_users").Where(tablename+" = 1").Find(result).GetErrors(); len(b)!=0 {
+	if b := d.Db.Debug().Table("all_users").Where(tablename+" = 1").Find(result).GetErrors(); len(b)!=0 {
 		ok=false
 		return
 	}

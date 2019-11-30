@@ -2,10 +2,8 @@ package service
 
 import (
 	"context"
-	"errors"
-	"github.com/mailgun/mailgun-go/v3"
 	"github.com/aymerick/raymond"
-	"github.com/spf13/viper"
+	"github.com/mailgun/mailgun-go/v3"
 	"io/ioutil"
 	"log"
 	"os"
@@ -39,18 +37,6 @@ func NewsendMailService()*sendMailService{
 	return tmp
 
 }
-func (s *sendMailService)ResendMail(email string, total string, messagebody string)error{
-	times:=viper.GetInt("resendtiems")
-	times=limitnum(times)//防止配置次数设置太多
-	for ;times>0;times--{
-		err:=s.SendMail(email,total,messagebody)
-		log.Println("send mail",email,err)
-		if err==nil{
-			return nil
-		}
-	}
-	return errors.New("Send Email Fail!")
-}
 //发邮件
 func (s *sendMailService)SendMail(email string, total string, messagebody string) error{
 	mess := s.mail.NewMessage(
@@ -77,15 +63,4 @@ func (s *sendMailService)getHtmlEmail()string{
 		os.Exit(1)
 	}
 	return result
-}
-
-func limitnum(num int)int{
-	if num<0{
-		return 1
-	}
-	if num>=20{
-		return 20
-	}
-	num++//这里是总次数=重试+1
-	return num
 }

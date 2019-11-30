@@ -8,8 +8,8 @@ type Message struct {
 	Type        string `gorm:"Column:type;not null;"`
 	Group       string `gorm:"Column:group"`
 	Success     bool   `gorm:"Column:success"`
-	SuccessUser int    `gorm:"Column:success_user"`
-	FailUser    int    `gorm:"Column:fail_user"`
+	//SuccessUser int    `gorm:"Column:success_user"`
+	//FailUser    int    `gorm:"Column:fail_user"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time
@@ -17,6 +17,6 @@ type Message struct {
 
 type MessService interface {
 	CreateMessage(*Message)bool
-	InsertMessSucess(*Message)bool
-	InsertMessFail(*Message)bool
+	//InsertMessSucess(*Message)bool
+	//InsertMessFail(*Message)bool
 }

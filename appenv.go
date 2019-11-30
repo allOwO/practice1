@@ -7,15 +7,16 @@ import (
 )
 
 type AppConfig struct {
-	Times        int    `yaml:"resendtiems"`
-	GrpcPort     string `yaml:"grpc_port"`
-	GrpcHost     string `yaml:"grpc_host"`
-	RabbitmqUser string `yaml:"mq_user"`
-	RabbitmqPwd  string `yaml:"mq_passwd"`
-	RabbitmqHost string `yaml:"mq_host"`
-	RabbitmqPort int    `yaml:"mq_port"`
-	Rabbitmqmail string `yaml:"rabbitmq_mail_queue"`
-	Mysqldsn     string `yaml:"mysql_dsn"`
+	Times         int    `mapstructure:"attempt_times";yaml:"attempt_times"`
+	GrpcPort      string `mapstructure:"grpc_port";yaml:"grpc_port"`
+	GrpcHost      string `mapstructure:"grpc_host";yaml:"grpc_host"`
+	RabbitmqUser  string `mapstructure:"mq_user";yaml:"mq_user"`
+	RabbitmqPwd   string `mapstructure:"mq_passwd";yaml:"mq_passwd"`
+	RabbitmqVHost string `mapstructure:"mq_vhost";yaml:"mq_vhost"`
+	RabbitmqHost  string `mapstructure:"mq_host";yaml:"mq_host"`
+	RabbitmqPort  int    `mapstructure:"mq_port";yaml:"mq_port"`
+	Rabbitmqmail  string `mapstructure:"rabbitmq_mail_queue";yaml:"rabbitmq_mail_queue"`
+	Mysqldsn      string `mapstructure:"mysql_dsn";yaml:"mysql_dsn"`
 }
 
 func (a *AppConfig) Load() {
@@ -30,11 +31,15 @@ func (a *AppConfig) JobOptions() job.JobManagerOptions {
 		Password: a.RabbitmqPwd,
 		Host:     a.RabbitmqHost,
 		Port:     a.RabbitmqPort,
-		Vhost:    a.RabbitmqHost,
+		Vhost:    a.RabbitmqVHost,
 	}
+}
+func (a *AppConfig) AttemptTimes() int {
+	return a.Times
 }
 
 type AppConfigService interface {
 	Load()
-	JobOptions()job.JobManagerOptions
+	AttemptTimes() int
+	JobOptions() job.JobManagerOptions
 }
