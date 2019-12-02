@@ -15,14 +15,12 @@ func NewDBservice(db *database.DB)*DBservice{
 	return d
 }
 //查询分组内所有用户
-func (d *DBservice)GetAllUsers(tablename string) (result *[]PracticeItem.User,ok bool) {
-	result = &[]PracticeItem.User{}
+func (d *DBservice)GetAllUsers(tablename string) (*[]PracticeItem.User,bool) {
+	result := &[]PracticeItem.User{}
 	if b := d.Db.Debug().Table("all_users").Where(tablename+" = 1").Find(result).GetErrors(); len(b)!=0 {
-		ok=false
-		return
+		return nil,false
 	}
-	ok=true
-	return
+	return result,true
 }
 //更新分组
 func (d *DBservice)UpdateUser(tablenames []string, key *PracticeItem.User) bool {

@@ -13,6 +13,7 @@
 ## 测试
 - 运行`make`
 - 运行`Dockerfile`
+- `docker run -tid --privileged <image id> /usr/sbin/init`
 - 配置文件默认在messenger同文件夹
 - 消息服务
     - `./messenger server`
