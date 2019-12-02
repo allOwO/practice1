@@ -10,4 +10,4 @@ mq_vhost: ""
 mq_port: 5672
 rabbitmq_mail_queue: "mail"
 # mysql
-mysql_dsn: "root:12345678@tcp(127.0.0.1:3306)/practice?charset=utf8&parseTime=True&loc=Local"
+mysql_dsn: "root:@tcp(127.0.0.1:3306)/practice?charset=utf8&parseTime=True&loc=Local"
