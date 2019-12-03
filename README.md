@@ -12,7 +12,7 @@
     - `worker`      运营
 ## 测试
 - 运行`make`
-- 运行`Dockerfile`
+- 运行`docker-compose up`
 - `docker run -tid --privileged <image id> /usr/sbin/init`
 - 配置文件默认在messenger同文件夹
 - 消息服务

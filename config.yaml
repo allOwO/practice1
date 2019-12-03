@@ -5,9 +5,9 @@ grpc_host: "127.0.0.1"
 #rabbitmq
 mq_user: "guest"
 mq_passwd: "guest"
-mq_host: "localhost"
+mq_host: "11.11.11.11"
 mq_vhost: ""
 mq_port: 5672
 rabbitmq_mail_queue: "mail"
 # mysql
-mysql_dsn: "root:@tcp(127.0.0.1:3306)/practice?charset=utf8&parseTime=True&loc=Local"
+mysql_dsn: "root:12345678@tcp(11.11.11.12:3306)/practice?charset=utf8&parseTime=True&loc=Local"
