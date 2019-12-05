@@ -10,14 +10,16 @@ import (
 	"strings"
 	"time"
 )
+
 type WebController struct {
 	webuser PracticeItem.WebUserService
-	user PracticeItem.UserService
+	user    PracticeItem.UserService
 }
-func NewWebController(webuser PracticeItem.WebUserService,user PracticeItem.UserService)*WebController{
-	return &WebController{webuser:webuser,user:user}
+
+func NewWebController(webuser PracticeItem.WebUserService, user PracticeItem.UserService) *WebController {
+	return &WebController{webuser: webuser, user: user}
 }
-func (w *WebController)CreateUser(ctx echo.Context) error {
+func (w *WebController) CreateUser(ctx echo.Context) error {
 	//body, _ := ioutil.ReadAll(ctx.Request().Body)
 	//log.Printf("body:%s\n", string(body))
 	tmp := PracticeItem.NewWebUserMess()
@@ -89,7 +91,7 @@ func (w *WebController)CreateUser(ctx echo.Context) error {
 }
 
 //post /changeuser
-func (w *WebController)ChangeUser(ctx echo.Context) error {
+func (w *WebController) ChangeUser(ctx echo.Context) error {
 	body, _ := ioutil.ReadAll(ctx.Request().Body)
 	log.Printf("body:%s\n", string(body))
 	//tmp := new(WebUserMess)
@@ -97,7 +99,6 @@ func (w *WebController)ChangeUser(ctx echo.Context) error {
 	tmp := new(PracticeItem.WebUserMess)
 
 	err := json.Unmarshal(body, &tmp)
-	log.Println(tmp)
 	if err != nil {
 		return ctx.JSON(200, SendJson{
 			Code:    stFail,
@@ -145,8 +146,6 @@ func (w *WebController)ChangeUser(ctx echo.Context) error {
 		Name:      tmp.UserName,
 		Phone:     tmp.UserPhone,
 		Mail:      tmp.UserMail,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 	tmp.UserMail = strings.ToLower(tmp.UserMail)
 	if ok := w.user.UpdateUser(tmp.Groups, user); ok == false {
@@ -164,7 +163,7 @@ func (w *WebController)ChangeUser(ctx echo.Context) error {
 }
 
 //get user
-func (w *WebController)CheckUser(ctx echo.Context) error {
+func (w *WebController) CheckUser(ctx echo.Context) error {
 	tmp := ctx.QueryParam("mail")
 	log.Println(tmp)
 	usr := w.webuser.GetUserInfo(tmp)
@@ -176,12 +175,13 @@ func (w *WebController)CheckUser(ctx echo.Context) error {
 			Message: "没有此用户",
 			Data:    nil,
 		})
+	} else {
+		return ctx.JSON(200, SendJson{
+			Code:    stSucc,
+			Message: "",
+			Data:    usr,
+		})
 	}
-	return ctx.JSON(200, SendJson{
-		Code:    stSucc,
-		Message: "",
-		Data:    usr,
-	})
 }
 
 const (

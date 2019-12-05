@@ -15,8 +15,23 @@ type User struct {
 	DeletedAt    *time.Time
 }
 
-
-
+func (u *User)SetGroups(tablenames []string) {
+	su:=false
+	w:=false
+	ss:=false
+	for _, name := range tablenames {
+		if name == "system_user" {
+			su= true
+		} else if name == "worker" {
+			w= true
+		} else if name == "service_staff" {
+			ss = true
+		}
+	}
+	u.SystemUser=su
+	u.Workers=w
+	u.ServiceStaff=ss
+}
 type UserService interface {
 	GetAllUsers(string) (*[]User, bool)
 	UpdateUser([]string,*User) bool

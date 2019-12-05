@@ -8,13 +8,11 @@ import (
 func (d *DBservice)GetUserInfo(usermail string) *PracticeItem.WebUserMess {
 	senduser := PracticeItem.NewWebUserMess()
 	tmp := &PracticeItem.User{}
-	selectflag := true
-	if ok := d.Db.Table("all_users").Where("user_mail = ?", usermail).First(tmp).RecordNotFound(); ok == false && selectflag {
-		senduser.Groups = append(senduser.Groups, "system_users")
-		selectflag = false
+	if ok := d.Db.Table("all_users").Where("user_mail = ?", usermail).First(tmp).RecordNotFound(); ok==true {
+		return nil
 	}
 	if tmp.Workers == true {
-		senduser.Groups = append(senduser.Groups, "workers")
+		senduser.Groups = append(senduser.Groups, "worker")
 	}
 	if tmp.SystemUser == true {
 		senduser.Groups = append(senduser.Groups, "system_user")
@@ -25,6 +23,6 @@ func (d *DBservice)GetUserInfo(usermail string) *PracticeItem.WebUserMess {
 	senduser.UserName = tmp.Name
 	senduser.UserMail = tmp.Mail
 	senduser.UserPhone = tmp.Phone
-	log.Println("find user sql",tmp,senduser)
+	log.Println("GetUserInfo result:",tmp,senduser)
 	return senduser
 }
