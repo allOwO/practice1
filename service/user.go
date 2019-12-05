@@ -3,6 +3,7 @@ package service
 import (
 	"PracticeItem"
 	"github.com/fpay/foundation-go/database"
+	"log"
 )
 
 type DBservice struct{
@@ -17,7 +18,7 @@ func NewDBservice(db *database.DB)*DBservice{
 //查询分组内所有用户
 func (d *DBservice)GetAllUsers(tablename string) (*[]PracticeItem.User,bool) {
 	result := &[]PracticeItem.User{}
-	if b := d.Db.Debug().Table("all_users").Where(tablename+" = 1").Find(result).GetErrors(); len(b)!=0 {
+	if e := d.Db.Debug().Table("all_users").Where(tablename+" = 1").Find(result).Error; e!=nil {
 		return nil,false
 	}
 	return result,true
@@ -25,10 +26,11 @@ func (d *DBservice)GetAllUsers(tablename string) (*[]PracticeItem.User,bool) {
 //更新分组
 func (d *DBservice)UpdateUser(tablenames []string, key *PracticeItem.User) bool {
 	key = setGroups(tablenames, key)
-	if b:=d.Db.Table("all_users").Where("user_mail = ?",key.Mail).Find(key).GetErrors();len(b)!=0{
+	if d.Db.Debug().Table("all_users").Where("user_mail = ?",key.Mail).Find(key).RecordNotFound(){
 		return false
 	}
-	if b := d.Db.Debug().Table("all_users").Where("id = ?",key.Mail).Updates(key).GetErrors(); len(b)!=0 {
+	if e := d.Db.Debug().Table("all_users").Where("id = ?",key.ID).Updates(key).Error; e!=nil {
+		log.Println(e)
 		return false
 	}
 	return true
@@ -36,7 +38,7 @@ func (d *DBservice)UpdateUser(tablenames []string, key *PracticeItem.User) bool 
 //新建用户
 func (d *DBservice)CreateUser(tablenames []string, key *PracticeItem.User) bool {
 	key = setGroups(tablenames, key)
-	if b := d.Db.Table("all_users").Create(key).GetErrors(); len(b)!=0 {
+	if e := d.Db.Table("all_users").Create(key).Error; e!=nil {
 		return false
 	}
 	return true

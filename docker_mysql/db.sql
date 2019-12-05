@@ -15,5 +15,5 @@ CREATE TABLE `all_users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_mail` (`user_mail`),
   KEY `idx_all_users_user_mail` (`user_mail`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 INSERT INTO `all_users` VALUES (1,'lzx','17645027795','575361715@qq.com',1,1,1,'2019-12-02 10:59:11','2019-12-02 10:59:11',NULL);

@@ -1,11 +1,11 @@
-version: '3'
+version: '2'
 services:
   mysql:
     image: mysql:8.0
     restart: always
     command: --default-authentication-plugin=mysql_native_password
     ports:
-      - 3306:3306
+      - 3333:3306
     environment:
       - TZ=Asia/Shanghai
       - MYSQL_ROOT_PASSWORD=12345678
@@ -18,8 +18,8 @@ services:
   rabbitmq:
     image: rabbitmq:3.8-management
     ports:
-      - 5672:5672
-      - 15672:15672
+      - 5673:5672
+      - 15673:15672
     container_name: "rabbitmq"
     networks:
      app_net:
@@ -30,6 +30,8 @@ services:
     ports:
       - 8000:8000
       - 3000:3000
+    volumes:
+      - ./:/root/messenger/
     depends_on:
       - mysql
       - rabbitmq
